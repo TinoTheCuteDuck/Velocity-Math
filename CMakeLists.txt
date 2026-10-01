@@ -6,15 +6,16 @@ project(
 		LANGUAGES CXX
 )
 
+
 # ----------------------------
 # C++ configuration
 # ----------------------------
+
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 
 # MSVC runtime
 if(MSVC)
@@ -28,6 +29,7 @@ endif()
 # Build options
 # ----------------------------
 
+
 option(
 		PRODUCTION_BUILD
 		"Build production version"
@@ -37,7 +39,7 @@ option(
 option(
 		MATH_BUILD_TESTS
 		"Build JSONParserTests"
-		OFF
+		ON
 )
 
 option(
@@ -46,12 +48,20 @@ option(
 		OFF
 )
 
+
 # ----------------------------
 # Sources
 # ----------------------------
 
+
+file(
+		GLOB_RECURSE HEADERS CONFIGURE_DEPENDS
+		"${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
+)
+
 add_library(
 		VelocityMath INTERFACE
+		${HEADERS}
 )
 
 add_library(
@@ -64,9 +74,11 @@ target_include_directories(
 		"${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
+
 # ----------------------------
 # Tests
 # ----------------------------
+
 
 if(MATH_BUILD_TESTS)
 
@@ -109,9 +121,11 @@ if(MATH_BUILD_TESTS)
 
 endif()
 
+
 # ----------------------------
 # Benchmarks
 # ----------------------------
+
 
 if(MATH_BUILD_BENCHMARKS)
 
@@ -137,16 +151,17 @@ if(MATH_BUILD_BENCHMARKS)
 
 endif()
 
+
 # ----------------------------
 # Defines
 # ----------------------------
+
 
 target_compile_definitions(
 		VelocityMath
 		INTERFACE
 		_CRT_SECURE_NO_WARNINGS
 )
-
 
 if(PRODUCTION_BUILD)
 
@@ -169,10 +184,10 @@ else()
 endif()
 
 
-
 # ----------------------------
 # Compiler warnings
 # ----------------------------
+
 
 if(MSVC)
 
@@ -194,9 +209,11 @@ else()
 
 endif()
 
+
 # ----------------------------
 # Optimizations
 # ----------------------------
+
 
 if(PRODUCTION_BUILD)
 
@@ -212,12 +229,6 @@ if(PRODUCTION_BUILD)
 				PROPERTIES
 				INTERPROCEDURAL_OPTIMIZATION TRUE
 		)
-	endif()
-
-	if(MSVC)
-		target_compile_options(VelocityMath INTERFACE /O2 /fp:fast)
-	else()
-		target_compile_options(VelocityMath INTERFACE -O3 -ffast-math -march=native)
 	endif()
 
 endif()
