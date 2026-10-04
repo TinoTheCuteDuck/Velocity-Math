@@ -265,7 +265,12 @@ struct Vector4 {
         };
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector4& vector) {
-        os << "(" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << ")";
+        os << "("
+            << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f)<< ", "
+            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
+            << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f) << ", "
+            << (std::abs(vector.w) > VELOCITY_MATH_EPSILON ? vector.w : 0.0f)
+        << ")";
         return os;
     }
 
@@ -308,8 +313,8 @@ struct Vector4 {
         return {x / len, y / len, z / len, w / len};
     }
 
-    static constexpr float dot(const Vector4& vec1, const Vector4& vec2) {
-        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z + vec1.w * vec2.w;
+    static constexpr float dot(const Vector4& a, const Vector4& b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     }
     static constexpr Vector4 reflect(const Vector4& incident, const Vector4& normal) {
         // normal vector must be normalized
@@ -339,20 +344,20 @@ struct Vector4 {
     static constexpr Vector4 max(const Vector4& a, const Vector4& b) {
         return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z), std::max(a.w, b.w)};
     }
-    static constexpr Vector4 abs(const Vector4& v) {
+    static constexpr Vector4 abs(const Vector4& vector) {
         return {
-            std::abs(v.x),
-            std::abs(v.y),
-            std::abs(v.z),
-            std::abs(v.w)
+            std::abs(vector.x),
+            std::abs(vector.y),
+            std::abs(vector.z),
+            std::abs(vector.w)
         };
     }
-    static constexpr Vector4 clamp(const Vector4& v, const Vector4& min, const Vector4& max) {
+    static constexpr Vector4 clamp(const Vector4& vector, const Vector4& min, const Vector4& max) {
         return {
-            std::clamp(v.x, min.x, max.x),
-            std::clamp(v.y, min.y, max.y),
-            std::clamp(v.z, min.z, max.z),
-            std::clamp(v.w, min.w, max.w)
+            std::clamp(vector.x, min.x, max.x),
+            std::clamp(vector.y, min.y, max.y),
+            std::clamp(vector.z, min.z, max.z),
+            std::clamp(vector.w, min.w, max.w)
         };
     }
 
@@ -365,5 +370,5 @@ struct Vector4 {
     }
 };
 
-inline Vector4 Vector4::zero = Vector4();
-inline Vector4 Vector4::one = Vector4(1);
+inline Vector4 Vector4::zero = Vector4(0.0f);
+inline Vector4 Vector4::one = Vector4(1.0f);

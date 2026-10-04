@@ -239,7 +239,11 @@ struct Vector3 {
         };
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
-        os << "(" << vector.x << ", " << vector.y << ", " << vector.z << ")";
+        os << "("
+            << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
+            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
+            << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f)
+        << ")";
         return os;
     }
 
@@ -281,8 +285,8 @@ struct Vector3 {
         return {x / len, y / len, z / len};
     }
 
-    static constexpr float dot(const Vector3& vec1, const Vector3& vec2) {
-        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+    static constexpr float dot(const Vector3& a, const Vector3& b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
     }
     static constexpr Vector3 cross(const Vector3& a, const Vector3& b) {
         return {
@@ -319,18 +323,18 @@ struct Vector3 {
     static constexpr Vector3 max(const Vector3& a, const Vector3& b) {
         return {std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z)};
     }
-    static constexpr Vector3 abs(const Vector3& v) {
+    static constexpr Vector3 abs(const Vector3& vector) {
         return {
-            std::abs(v.x),
-            std::abs(v.y),
-            std::abs(v.z)
+            std::abs(vector.x),
+            std::abs(vector.y),
+            std::abs(vector.z)
         };
     }
-    static constexpr Vector3 clamp(const Vector3& v, const Vector3& min, const Vector3& max) {
+    static constexpr Vector3 clamp(const Vector3& vector, const Vector3& min, const Vector3& max) {
         return {
-            std::clamp(v.x, min.x, max.x),
-            std::clamp(v.y, min.y, max.y),
-            std::clamp(v.z, min.z, max.z)
+            std::clamp(vector.x, min.x, max.x),
+            std::clamp(vector.y, min.y, max.y),
+            std::clamp(vector.z, min.z, max.z)
         };
     }
 
@@ -343,8 +347,8 @@ struct Vector3 {
     }
 };
 
-inline Vector3 Vector3::zero = Vector3();
-inline Vector3 Vector3::one = Vector3(1);
-inline Vector3 Vector3::up = Vector3(0, 1, 0);
-inline Vector3 Vector3::right = Vector3(1, 0, 0);
-inline Vector3 Vector3::forward = Vector3(0, 0, -1);
+inline Vector3 Vector3::zero = Vector3(0.0f);
+inline Vector3 Vector3::one = Vector3(1.0f);
+inline Vector3 Vector3::up = Vector3(0.0f, 1.0f, 0.0f);
+inline Vector3 Vector3::right = Vector3(1.0f, 0.0f, 0.0f);
+inline Vector3 Vector3::forward = Vector3(0.0f, 0.0f, -1.0f);

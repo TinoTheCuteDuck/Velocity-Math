@@ -210,7 +210,9 @@ struct Vector2 {
         };
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector2& vector) {
-        os << "(" << vector.x << ", " << vector.y << ")";
+        os << "(" << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
+            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f)
+        << ")";
         return os;
     }
 
@@ -251,8 +253,8 @@ struct Vector2 {
         return {x / len, y / len};
     }
 
-    static constexpr float dot(const Vector2& vec1, const Vector2& vec2) {
-        return vec1.x * vec2.x + vec1.y * vec2.y;
+    static constexpr float dot(const Vector2& a, const Vector2& b) {
+        return a.x * b.x + a.y * b.y;
     }
     static constexpr Vector2 reflect(const Vector2& incident, const Vector2& normal) {
         // normal vector must be normalized
@@ -282,16 +284,16 @@ struct Vector2 {
     static constexpr Vector2 max(const Vector2& a, const Vector2& b) {
         return {std::max(a.x, b.x), std::max(a.y, b.y)};
     }
-    static constexpr Vector2 abs(const Vector2& v) {
+    static constexpr Vector2 abs(const Vector2& vector) {
         return {
-            std::abs(v.x),
-            std::abs(v.y)
+            std::abs(vector.x),
+            std::abs(vector.y)
         };
     }
-    static constexpr Vector2 clamp(const Vector2& v, const Vector2& min, const Vector2& max) {
+    static constexpr Vector2 clamp(const Vector2& vector, const Vector2& min, const Vector2& max) {
         return {
-            std::clamp(v.x, min.x, max.x),
-            std::clamp(v.y, min.y, max.y)
+            std::clamp(vector.x, min.x, max.x),
+            std::clamp(vector.y, min.y, max.y)
         };
     }
 
@@ -304,7 +306,7 @@ struct Vector2 {
     }
 };
 
-inline Vector2 Vector2::zero = Vector2();
-inline Vector2 Vector2::one = Vector2(1);
-inline Vector2 Vector2::up = Vector2(0, 1);
-inline Vector2 Vector2::right = Vector2(1, 0);
+inline Vector2 Vector2::zero = Vector2(0.0f);
+inline Vector2 Vector2::one = Vector2(1.0f);
+inline Vector2 Vector2::up = Vector2(0.0f, 1.0f);
+inline Vector2 Vector2::right = Vector2(1.0f, 0.0f);

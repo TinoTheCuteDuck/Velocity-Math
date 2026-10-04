@@ -48,7 +48,9 @@ struct Mat2 {
         Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                result[col][row] = other[col][0] * m[0][row] + other[col][1] * m[1][row];
+                for (int k = 0; k < 2; k++) {
+                    result[col][row] += other[col][k] * m[k][row];
+                }
             }
         }
 
@@ -58,34 +60,36 @@ struct Mat2 {
 
     // Arithmetic matrix operators
     constexpr Mat2 operator+(const Mat2& other) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] + other[col][row];
+                result[col][row] = m[col][row] + other[col][row];
             }
         }
 
-        return mat;
+        return result;
     }
     constexpr Mat2 operator-(const Mat2& other) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] - other[col][row];
+                result[col][row] = m[col][row] - other[col][row];
             }
         }
 
-        return mat;
+        return result;
     }
     constexpr Mat2 operator*(const Mat2& other) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = other[col][0] * m[0][row] + other[col][1] * m[1][row];
+                for (int k = 0; k < 2; k++) {
+                    result[col][row] += other[col][k] * m[k][row];
+                }
             }
         }
 
-        return mat;
+        return result;
     }
 
     // Compound scalar assignment
@@ -133,34 +137,34 @@ struct Mat2 {
 
     // Arithmetic scalar operators
     constexpr Mat2 operator+(const float scalar) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] + scalar;
+                result[col][row] = m[col][row] + scalar;
             }
         }
 
-        return mat;
+        return result;
     }
     constexpr Mat2 operator-(const float scalar) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] - scalar;
+                result[col][row] = m[col][row] - scalar;
             }
         }
 
-        return mat;
+        return result;
     }
     constexpr Mat2 operator*(const float scalar) const {
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] * scalar;
+                result[col][row] = m[col][row] * scalar;
             }
         }
 
-        return mat;
+        return result;
     }
     constexpr Mat2 operator/(const float scalar) const {
         if (std::abs(scalar) < VELOCITY_MATH_EPSILON) {
@@ -168,14 +172,14 @@ struct Mat2 {
             return *this;
         }
 
-        Mat2 mat = zero;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
-                mat[col][row] = m[col][row] / scalar;
+                result[col][row] = m[col][row] / scalar;
             }
         }
 
-        return mat;
+        return result;
     }
 
     // Miscellaneous
@@ -207,7 +211,8 @@ struct Mat2 {
         for (int row = 0; row < 2; row++) {
             os << '[';
             for (int col = 0; col < 2; col++) {
-                os << mat[col][row];
+                os << (std::abs(mat[col][row]) > VELOCITY_MATH_EPSILON ? mat[col][row] : 0.0f);
+
                 if (col != 1) {
                     os << ", ";
                 }
@@ -218,9 +223,11 @@ struct Mat2 {
         return os;
     }
     friend Vector2 operator*(const Mat2& mat, const Vector2& vector) {
-        Vector2 result;
+        Vector2 result = Vector2::zero;
         for (int row = 0; row < 2; row++) {
-            result[row] = vector[0] * mat[0][row] + vector[1] * mat[1][row];
+            for (int col = 0; col < 2; col++) {
+                result[row] += vector[col] * mat[col][row];
+            }
         }
 
         return result;
@@ -254,23 +261,7 @@ struct Mat2 {
         };
     }
     constexpr Mat2& invert() {
-        const float det = determinant();
-        if (std::abs(det) < VELOCITY_MATH_EPSILON) {
-            VELOCITY_MATH_ERROR("Tried to get inverse of a matrix where the determinant is zero");
-            return *this;
-        }
-
-        const float invDet = 1 / det;
-        std::swap(m[0][0], m[1][1]);
-        m[0][1] = -m[0][1];
-        m[1][0] = -m[1][0];
-
-        for (int col = 0; col < 2; col++) {
-            for (int row = 0; row < 2; row++) {
-                m[col][row] *= invDet;
-            }
-        }
-
+        *this = inverse();
         return *this;
     }
     [[nodiscard]] constexpr Mat2 inverse() const {
@@ -291,7 +282,7 @@ struct Mat2 {
     }
 
     static constexpr Mat2 abs(const Mat2& mat) {
-        Mat2 result;
+        Mat2 result = zero;
         for (int col = 0; col < 2; col++) {
             for (int row = 0; row < 2; row++) {
                 result[col][row] = std::abs(mat[col][row]);
