@@ -22,8 +22,8 @@ struct Mat2 {
     constexpr Mat2(const float c0r0, const float c0r1, const float c1r0, const float c1r1) : m({c0r0, c0r1}, {c1r0, c1r1}) {}
 
     // Static members
-    static Mat2 zero;
-    static Mat2 identity;
+    static const Mat2 zero;
+    static const Mat2 identity;
 
     // Compound matrix assignment
     constexpr Mat2& operator+=(const Mat2& other) {
@@ -323,5 +323,5 @@ struct Mat2 {
     }
 };
 
-inline Mat2 Mat2::zero = Mat2(0.0f);
-inline Mat2 Mat2::identity = Mat2(1.0f);
+constexpr Mat2 Mat2::zero = Mat2(0.0f);
+constexpr Mat2 Mat2::identity = Mat2(1.0f);

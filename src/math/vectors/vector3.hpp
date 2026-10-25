@@ -20,11 +20,11 @@ struct Vector3 {
     constexpr Vector3(const float values[3]) : x(values[0]), y(values[1]), z(values[2]) {}
 
     // Static members
-    static Vector3 zero;
-    static Vector3 one;
-    static Vector3 up;
-    static Vector3 right;
-    static Vector3 forward;
+    static const Vector3 zero;
+    static const Vector3 one;
+    static const Vector3 up;
+    static const Vector3 right;
+    static const Vector3 forward;
 
     // Compound vector assignment
     constexpr Vector3& operator+=(const Vector3& other) {
@@ -193,12 +193,12 @@ struct Vector3 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            case 2: return z;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector3");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector3");
+            return x;
         }
     }
     constexpr const float& operator[](const size_t index) const {
@@ -208,12 +208,12 @@ struct Vector3 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            case 2: return z;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector3");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector3");
+            return x;
         }
     }
     constexpr bool operator==(const Vector3& other) const {
@@ -240,10 +240,10 @@ struct Vector3 {
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
         os << "("
-            << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
-            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
-            << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f)
-        << ")";
+           << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
+           << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
+           << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f)
+           << ")";
         return os;
     }
 
@@ -267,7 +267,7 @@ struct Vector3 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector3 with length zero");
-            return zero;
+            return *this;
         }
 
         x /= len;
@@ -279,10 +279,14 @@ struct Vector3 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector3 with length zero");
-            return {};
+            return *this;
         }
 
-        return {x / len, y / len, z / len};
+        return {
+            x / len,
+            y / len,
+            z / len
+        };
     }
 
     static constexpr float dot(const Vector3& a, const Vector3& b) {
@@ -309,7 +313,7 @@ struct Vector3 {
         const Vector3 refractedParallel = incidentParallel * eta;
 
         if (refractedParallel.lengthSquared() > 1) {
-            return {};
+            return zero;
         }
 
         const Vector3 refractedPerpendicular = std::sqrt(std::max(0.0f, 1.0f - refractedParallel.lengthSquared())) * -normal;
@@ -347,8 +351,8 @@ struct Vector3 {
     }
 };
 
-inline Vector3 Vector3::zero = Vector3(0.0f);
-inline Vector3 Vector3::one = Vector3(1.0f);
-inline Vector3 Vector3::up = Vector3(0.0f, 1.0f, 0.0f);
-inline Vector3 Vector3::right = Vector3(1.0f, 0.0f, 0.0f);
-inline Vector3 Vector3::forward = Vector3(0.0f, 0.0f, -1.0f);
+constexpr Vector3 Vector3::zero = Vector3(0.0f);
+constexpr Vector3 Vector3::one = Vector3(1.0f);
+constexpr Vector3 Vector3::up = Vector3(0.0f, 1.0f, 0.0f);
+constexpr Vector3 Vector3::right = Vector3(1.0f, 0.0f, 0.0f);
+constexpr Vector3 Vector3::forward = Vector3(0.0f, 0.0f, -1.0f);

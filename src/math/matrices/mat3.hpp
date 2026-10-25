@@ -18,12 +18,20 @@ struct Mat3 {
             }
         }
     }
-    constexpr Mat3(const Vector3& column0, const Vector3& column1, const Vector3& column2) : m({column0.x, column0.y, column0.z}, {column1.x, column1.y, column1.z}, {column2.x, column2.y, column2.z}) {}
-    constexpr Mat3(const float c0r0, const float c0r1, const float c0r2, const float c1r0, const float c1r1, const float c1r2, const float c2r0, const float c2r1, const float c2r2) : m({c0r0, c0r1, c0r2}, {c1r0, c1r1, c1r2}, {c2r0, c2r1, c2r2}) {}
+    constexpr Mat3(const Vector3& column0, const Vector3& column1, const Vector3& column2) : m(
+        {column0.x, column0.y, column0.z},
+        {column1.x, column1.y, column1.z},
+        {column2.x, column2.y, column2.z}
+    ) {}
+    constexpr Mat3(
+        const float c0r0, const float c0r1, const float c0r2,
+        const float c1r0, const float c1r1, const float c1r2,
+        const float c2r0, const float c2r1, const float c2r2
+    ) : m({c0r0, c0r1, c0r2}, {c1r0, c1r1, c1r2}, {c2r0, c2r1, c2r2}) {}
 
     // Static members
-    static Mat3 zero;
-    static Mat3 identity;
+    static const Mat3 zero;
+    static const Mat3 identity;
 
     // Compound matrix assignment
     constexpr Mat3& operator+=(const Mat3& other) {
@@ -249,8 +257,8 @@ struct Mat3 {
 
     [[nodiscard]] constexpr float determinant() const {
         return m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) -
-            m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) +
-            m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
+               m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) +
+               m[2][0] * (m[0][1] * m[1][2] - m[1][1] * m[0][2]);
     }
     constexpr Mat3& transpose() {
         std::swap(m[0][1], m[1][0]);
@@ -285,7 +293,7 @@ struct Mat3 {
         }
 
         const float invDet = 1 / det;
-        Mat3 result {
+        Mat3 result{
             (m[1][1] * m[2][2] - m[2][1] * m[1][2]) * invDet,
             -(m[1][0] * m[2][2] - m[2][0] * m[1][2]) * invDet,
             (m[1][0] * m[2][1] - m[2][0] * m[1][1]) * invDet,
@@ -348,5 +356,5 @@ struct Mat3 {
     }
 };
 
-inline Mat3 Mat3::zero = Mat3(0.0f);
-inline Mat3 Mat3::identity = Mat3(1.0f);
+constexpr Mat3 Mat3::zero = Mat3(0.0f);
+constexpr Mat3 Mat3::identity = Mat3(1.0f);

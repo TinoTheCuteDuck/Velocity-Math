@@ -16,10 +16,10 @@ struct Vector2 {
     constexpr Vector2(const float values[2]) : x(values[0]), y(values[1]) {}
 
     // Static members
-    static Vector2 zero;
-    static Vector2 one;
-    static Vector2 up;
-    static Vector2 right;
+    static const Vector2 zero;
+    static const Vector2 one;
+    static const Vector2 up;
+    static const Vector2 right;
 
     // Compound vector assignment
     constexpr Vector2& operator+=(const Vector2& other) {
@@ -110,7 +110,8 @@ struct Vector2 {
     constexpr Vector2 operator+(const float scalar) const {
         return {
             x + scalar,
-            y + scalar};
+            y + scalar
+        };
     }
     constexpr Vector2 operator-(const float scalar) const {
         return {
@@ -169,11 +170,11 @@ struct Vector2 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector2");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector2");
+            return x;
         }
     }
     constexpr const float& operator[](const size_t index) const {
@@ -183,11 +184,11 @@ struct Vector2 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector2");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector2");
+            return x;
         }
     }
     constexpr bool operator==(const Vector2& other) const {
@@ -211,8 +212,8 @@ struct Vector2 {
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector2& vector) {
         os << "(" << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
-            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f)
-        << ")";
+           << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f)
+           << ")";
         return os;
     }
 
@@ -236,7 +237,7 @@ struct Vector2 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector2 with length zero");
-            return zero;
+            return *this;
         }
 
         x /= len;
@@ -247,10 +248,13 @@ struct Vector2 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector2 with length zero");
-            return {};
+            return *this;
         }
 
-        return {x / len, y / len};
+        return {
+            x / len,
+            y / len
+        };
     }
 
     static constexpr float dot(const Vector2& a, const Vector2& b) {
@@ -270,7 +274,7 @@ struct Vector2 {
         const Vector2 refractedParallel = incidentParallel * eta;
 
         if (refractedParallel.lengthSquared() > 1) {
-            return {};
+            return zero;
         }
 
         const Vector2 refractedPerpendicular = std::sqrt(std::max(0.0f, 1.0f - refractedParallel.lengthSquared())) * -normal;
@@ -306,7 +310,7 @@ struct Vector2 {
     }
 };
 
-inline Vector2 Vector2::zero = Vector2(0.0f);
-inline Vector2 Vector2::one = Vector2(1.0f);
-inline Vector2 Vector2::up = Vector2(0.0f, 1.0f);
-inline Vector2 Vector2::right = Vector2(1.0f, 0.0f);
+constexpr Vector2 Vector2::zero = Vector2(0.0f);
+constexpr Vector2 Vector2::one = Vector2(1.0f);
+constexpr Vector2 Vector2::up = Vector2(0.0f, 1.0f);
+constexpr Vector2 Vector2::right = Vector2(1.0f, 0.0f);

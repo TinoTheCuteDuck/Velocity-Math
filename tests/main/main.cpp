@@ -10,14 +10,12 @@
 #include <iostream>
 
 int main() {
-    Vector3 incident = Vector3(1, -1, 0).normalize();
-    Vector3 normal = Vector3::up;
+    Vector4 point = Vector4(Vector3(1, 0, -1), 1);
+    Vector3 cameraPosition = Vector3(1, 0, 0);
+    Mat4 view = Mat4::lookAt(cameraPosition, cameraPosition + Vector3::right, Vector3::up);
+    Vector4 transformed = view * point;
 
-    Mat4 a = Mat4(2, 41,121,421,241,421,4,41,134,1,631,123,67,3,78,5);
-
-    std::cout << "Mat: \n" << a << std::endl;
-    std::cout << "Inverse: \n" << a.inverse()  << std::endl;
-    std::cout << "Identity: \n" << a * a.inverse() << std::endl;
+    std::cout << transformed << std::endl;
 
     return 0;
 }

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "math/defines.hpp"
+#include "math/vectors/vector3.hpp"
 #include "math/vectors/vector4.hpp"
+
+#include <iostream>
 
 struct Mat4 {
   private:
@@ -9,8 +12,8 @@ struct Mat4 {
 
   public:
     // Constructors
-    constexpr Mat4() : m({1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}) {}
-    constexpr Mat4(const float scale) : m({scale, 0, 0, 0}, {0, scale, 0, 0}, {0, 0, scale, 0}, {0, 0, 0, scale}) {}
+    constexpr Mat4() : m({ 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 }) {}
+    constexpr Mat4(const float scale) : m({ scale, 0, 0, 0 }, { 0, scale, 0, 0 }, { 0, 0, scale, 0 }, { 0, 0, 0, scale }) {}
     constexpr Mat4(const float values[16]) : m() {
         for (size_t col = 0; col < 4; col++) {
             for (size_t row = 0; row < 4; row++) {
@@ -19,21 +22,21 @@ struct Mat4 {
         }
     }
     constexpr Mat4(const Vector4& column0, const Vector4& column1, const Vector4& column2, const Vector4& column3) : m(
-        {column0.x, column0.y, column0.z, column0.w},
-        {column1.x, column1.y, column1.z, column1.w},
-        {column2.x, column2.y, column2.z, column2.w},
-        {column3.x, column3.y, column3.z, column3.w}
+        { column0.x, column0.y, column0.z, column0.w },
+        { column1.x, column1.y, column1.z, column1.w },
+        { column2.x, column2.y, column2.z, column2.w },
+        { column3.x, column3.y, column3.z, column3.w }
     ) {}
     constexpr Mat4(
         const float c0r0, const float c0r1, const float c0r2, const float c0r3,
         const float c1r0, const float c1r1, const float c1r2, const float c1r3,
         const float c2r0, const float c2r1, const float c2r2, const float c2r3,
         const float c3r0, const float c3r1, const float c3r2, const float c3r3
-    ) : m({c0r0, c0r1, c0r2, c0r3}, {c1r0, c1r1, c1r2, c1r3}, {c2r0, c2r1, c2r2, c2r3}, {c3r0, c3r1, c3r2, c3r3}) {}
+    ) : m({ c0r0, c0r1, c0r2, c0r3 }, { c1r0, c1r1, c1r2, c1r3 }, { c2r0, c2r1, c2r2, c2r3 }, { c3r0, c3r1, c3r2, c3r3 }) {}
 
     // Static members
-    static Mat4 zero;
-    static Mat4 identity;
+    static const Mat4 zero;
+    static const Mat4 identity;
 
     // Compound matrix assignment
     constexpr Mat4& operator+=(const Mat4& other) {
@@ -261,9 +264,9 @@ struct Mat4 {
 
     [[nodiscard]] constexpr float determinant() const {
         return m[0][0] * determinant3x3(m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) -
-            m[1][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) +
-            m[2][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[1][1], m[1][2], m[1][3], m[3][1], m[3][2], m[3][3]) -
-            m[3][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3]);
+               m[1][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) +
+               m[2][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[1][1], m[1][2], m[1][3], m[3][1], m[3][2], m[3][3]) -
+               m[3][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3]);
     }
     constexpr Mat4& transpose() {
         std::swap(m[0][1], m[1][0]);
@@ -309,7 +312,7 @@ struct Mat4 {
         }
 
         const float invDet = 1 / det;
-        Mat4 result {
+        Mat4 result{
             determinant3x3(m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) * invDet,
             -determinant3x3(m[1][0], m[1][2], m[1][3], m[2][0], m[2][2], m[2][3], m[3][0], m[3][2], m[3][3]) * invDet,
             determinant3x3(m[1][0], m[1][1], m[1][3], m[2][0], m[2][1], m[2][3], m[3][0], m[3][1], m[3][3]) * invDet,
@@ -382,14 +385,93 @@ struct Mat4 {
         return result;
     }
 
+    static constexpr Mat4 scale(const float x, const float y, const float z) {
+        Mat4 m = identity;
+        m[0][0] = x;
+        m[1][1] = y;
+        m[2][2] = z;
+
+        return m;
+    }
+    static constexpr Mat4 scale(const Vector3& scale) {
+        Mat4 m = identity;
+        m[0][0] = scale.x;
+        m[1][1] = scale.y;
+        m[2][2] = scale.z;
+
+        return m;
+    }
+    static constexpr Mat4 translate(const float x, const float y, const float z) {
+        Mat4 m = identity;
+        m[3][0] = x;
+        m[3][1] = y;
+        m[3][2] = z;
+
+        return m;
+    }
+    static constexpr Mat4 translate(const Vector3& position) {
+        Mat4 m = identity;
+        m[3][0] = position.x;
+        m[3][1] = position.y;
+        m[3][2] = position.z;
+
+        return m;
+    }
+
+    // Right-handed -z forward perspective
+    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float near, const float far) {
+        Mat4 m = zero;
+        const float t = near * std::tan(FOV / 2);
+        const float r = aspectRatio * t;
+
+        m[0][0] = near / r;
+        m[1][1] = near / t;
+        m[2][2] = -(far + near) / (far - near);
+        m[3][2] = -2 * near * far / (far - near);
+        m[2][3] = -1;
+
+        return m;
+    }
+    // Right-handed -z forward infinite far perspective
+    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float near) {
+        Mat4 m = zero;
+        const float t = near * std::tan(FOV / 2);
+        const float r = aspectRatio * t;
+
+        m[0][0] = near / r;
+        m[1][1] = near / t;
+        m[2][2] = -1;
+        m[3][2] = -2 * near;
+        m[2][3] = -1;
+
+        return m;
+    }
+    static constexpr Mat4 orthographic(const float FOV, const float aspectRation, const float near, const float far) {
+        Mat4 m = zero;
+
+
+        return m;
+    }
+    static constexpr Mat4 lookAt(const Vector3& eye, const Vector3& target, const Vector3& worldUp) {
+        const Vector3 forward = (target - eye).normalize();
+        const Vector3 right = Vector3::cross(forward, worldUp).normalize();
+        const Vector3 up = Vector3::cross(right, forward);
+
+        return Mat4{
+            Vector4(right.x, up.x, -forward.x, Vector3::dot(right, -eye)),
+            Vector4(right.y, up.y, -forward.y, Vector3::dot(up, -eye)),
+            Vector4(right.z, up.z, -forward.z, Vector3::dot(forward, eye)),
+            Vector4(0, 0, 0, 1)
+        };
+    }
+
   private:
     static constexpr float determinant3x3(const float c0r0, const float c0r1, const float c0r2, const float c1r0, const float c1r1, const float c1r2, const float c2r0, const float c2r1, const float c2r2) {
         return c0r0 * (c1r1 * c2r2 - c2r1 * c1r2) -
-            c1r0 * (c0r1 * c2r2 - c2r1 * c0r2) +
-            c2r0 * (c0r1 * c1r2 - c1r1 * c0r2);
+               c1r0 * (c0r1 * c2r2 - c2r1 * c0r2) +
+               c2r0 * (c0r1 * c1r2 - c1r1 * c0r2);
     }
-
 };
 
-inline Mat4 Mat4::zero = Mat4(0.0f);
-inline Mat4 Mat4::identity = Mat4(1.0f);
+constexpr Mat4 Mat4::zero = Mat4(0.0f);
+constexpr Mat4 Mat4::identity = Mat4(1.0f);

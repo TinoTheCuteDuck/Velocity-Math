@@ -26,8 +26,8 @@ struct Vector4 {
     constexpr Vector4(const float values[4]) : x(values[0]), y(values[1]), z(values[2]), w(values[3]) {}
 
     // Static members
-    static Vector4 zero;
-    static Vector4 one;
+    static const Vector4 zero;
+    static const Vector4 one;
 
     // Compound vector assignment
     constexpr Vector4& operator+=(const Vector4& other) {
@@ -204,7 +204,7 @@ struct Vector4 {
     }
 
     // Miscellaneous
-    friend constexpr Vector4 operator*(const float scalar, const Vector4 &vector) {
+    friend constexpr Vector4 operator*(const float scalar, const Vector4& vector) {
         return vector * scalar;
     }
     constexpr float& operator[](const size_t index) {
@@ -214,13 +214,13 @@ struct Vector4 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            case 2: return z;
-            case 3: return w;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector4");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        case 3: return w;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector4");
+            return x;
         }
     }
     constexpr const float& operator[](const size_t index) const {
@@ -230,13 +230,13 @@ struct Vector4 {
         }
 
         switch (index) {
-            case 0: return x;
-            case 1: return y;
-            case 2: return z;
-            case 3: return w;
-            default:
-                VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector4");
-                return x;
+        case 0: return x;
+        case 1: return y;
+        case 2: return z;
+        case 3: return w;
+        default:
+            VELOCITY_MATH_ERROR("Tried to access index out of bounds on Vector4");
+            return x;
         }
     }
     constexpr bool operator==(const Vector4& other) const {
@@ -266,11 +266,11 @@ struct Vector4 {
     }
     friend std::ostream& operator<<(std::ostream& os, const Vector4& vector) {
         os << "("
-            << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f)<< ", "
-            << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
-            << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f) << ", "
-            << (std::abs(vector.w) > VELOCITY_MATH_EPSILON ? vector.w : 0.0f)
-        << ")";
+           << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
+           << (std::abs(vector.y) > VELOCITY_MATH_EPSILON ? vector.y : 0.0f) << ", "
+           << (std::abs(vector.z) > VELOCITY_MATH_EPSILON ? vector.z : 0.0f) << ", "
+           << (std::abs(vector.w) > VELOCITY_MATH_EPSILON ? vector.w : 0.0f)
+           << ")";
         return os;
     }
 
@@ -294,7 +294,7 @@ struct Vector4 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector4 with length zero");
-            return zero;
+            return *this;
         }
 
         x /= len;
@@ -307,10 +307,15 @@ struct Vector4 {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
             VELOCITY_MATH_ERROR("Tried to normalize Vector4 with length zero");
-            return {};
+            return *this;
         }
 
-        return {x / len, y / len, z / len, w / len};
+        return {
+            x / len,
+            y / len,
+            z / len,
+            w / len
+        };
     }
 
     static constexpr float dot(const Vector4& a, const Vector4& b) {
@@ -330,7 +335,7 @@ struct Vector4 {
         const Vector4 refractedParallel = incidentParallel * eta;
 
         if (refractedParallel.lengthSquared() > 1) {
-            return {};
+            return zero;
         }
 
         const Vector4 refractedPerpendicular = std::sqrt(std::max(0.0f, 1.0f - refractedParallel.lengthSquared())) * -normal;
@@ -370,5 +375,5 @@ struct Vector4 {
     }
 };
 
-inline Vector4 Vector4::zero = Vector4(0.0f);
-inline Vector4 Vector4::one = Vector4(1.0f);
+constexpr Vector4 Vector4::zero = Vector4(0.0f);
+constexpr Vector4 Vector4::one = Vector4(1.0f);
