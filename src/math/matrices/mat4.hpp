@@ -4,7 +4,11 @@
 #include "math/vectors/vector3.hpp"
 #include "math/vectors/vector4.hpp"
 
-#include <iostream>
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <ostream>
+#include <utility>
 
 struct Mat4 {
   private:
@@ -419,49 +423,58 @@ struct Mat4 {
     }
 
     // Right-handed -z forward perspective
-    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float near, const float far) {
+    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float zNear, const float zFar) {
         Mat4 m = zero;
-        const float t = near * std::tan(FOV / 2);
+        const float t = zNear * std::tan(FOV / 2);
         const float r = aspectRatio * t;
 
-        m[0][0] = near / r;
-        m[1][1] = near / t;
-        m[2][2] = -(far + near) / (far - near);
-        m[3][2] = -2 * near * far / (far - near);
+        m[0][0] = zNear / r;
+        m[1][1] = zNear / t;
+        m[2][2] = -(zFar + zNear) / (zFar - zNear);
+        m[3][2] = -2 * zNear * zFar / (zFar - zNear);
         m[2][3] = -1;
 
         return m;
     }
     // Right-handed -z forward infinite far perspective
-    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float near) {
+    static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float zNear) {
         Mat4 m = zero;
-        const float t = near * std::tan(FOV / 2);
+        const float t = zNear * std::tan(FOV / 2);
         const float r = aspectRatio * t;
 
-        m[0][0] = near / r;
-        m[1][1] = near / t;
+        m[0][0] = zNear / r;
+        m[1][1] = zNear / t;
         m[2][2] = -1;
-        m[3][2] = -2 * near;
+        m[3][2] = -2 * zNear;
         m[2][3] = -1;
 
         return m;
     }
-    static constexpr Mat4 orthographic(const float FOV, const float aspectRation, const float near, const float far) {
+    // Right-handed -z forward
+    static constexpr Mat4 orthographic(const float left, const float right, const float bottom, const float top, const float zNear, const float zFar) {
         Mat4 m = zero;
 
+        m[0][0] = 2 / (right - left);
+        m[1][1] = 2 / (top - bottom);
+        m[2][2] = -2 / (zFar - zNear);
+        m[3][0] = -(right + left) / (right - left);
+        m[3][1] = -(top + bottom) / (top - bottom);
+        m[3][2] = -(zFar + zNear) / (zFar - zNear);
+        m[3][3] = 1;
 
         return m;
     }
+    // Right-handed -z forward
     static constexpr Mat4 lookAt(const Vector3& eye, const Vector3& target, const Vector3& worldUp) {
         const Vector3 forward = (target - eye).normalize();
         const Vector3 right = Vector3::cross(forward, worldUp).normalize();
         const Vector3 up = Vector3::cross(right, forward);
 
         return Mat4{
-            Vector4(right.x, up.x, -forward.x, Vector3::dot(right, -eye)),
-            Vector4(right.y, up.y, -forward.y, Vector3::dot(up, -eye)),
-            Vector4(right.z, up.z, -forward.z, Vector3::dot(forward, eye)),
-            Vector4(0, 0, 0, 1)
+            Vector4(right.x, up.x, -forward.x, 0),
+            Vector4(right.y, up.y, -forward.y, 0),
+            Vector4(right.z, up.z, -forward.z, 0),
+            Vector4(Vector3::dot(right, -eye), Vector3::dot(up, -eye), Vector3::dot(forward, eye), 1)
         };
     }
 

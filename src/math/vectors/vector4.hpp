@@ -4,6 +4,11 @@
 #include "math/vectors/vector2.hpp"
 #include "math/vectors/vector3.hpp"
 
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <ostream>
+
 struct Vector4 {
     // Members
     union { float x, r, s; };

@@ -3,6 +3,12 @@
 #include "math/defines.hpp"
 #include "math/vectors/vector2.hpp"
 
+#include <ostream>
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <utility>
+
 struct Mat2 {
   private:
     float m[2][2]; // Column major [column][row]

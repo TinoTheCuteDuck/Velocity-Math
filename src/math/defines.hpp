@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <ostream>
-#include <functional>
-
 #ifndef VELOCITY_MATH_ERROR
     #include <stdexcept>
     #define VELOCITY_MATH_ERROR(msg) throw std::runtime_error(msg)

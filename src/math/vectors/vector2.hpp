@@ -2,6 +2,11 @@
 
 #include "math/defines.hpp"
 
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <ostream>
+
 struct Vector2 {
     // Members
     union { float x, r, s; };

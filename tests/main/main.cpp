@@ -1,12 +1,8 @@
-#include "math/matrices/mat2.hpp"
-#include "math/matrices/mat3.hpp"
 #include "math/matrices/mat4.hpp"
 
-#include "math/vectors/vector2.hpp"
 #include "math/vectors/vector3.hpp"
 #include "math/vectors/vector4.hpp"
 
-#include <cmath>
 #include <iostream>
 
 int main() {

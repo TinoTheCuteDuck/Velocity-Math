@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 
 project(
 		VelocityMath
@@ -16,6 +16,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE include-what-you-use)
+set(CMAKE_VERIFY_INTERFACE_HEADER_SETS ON)
 
 # MSVC runtime
 if(MSVC)
@@ -59,9 +61,14 @@ file(
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
 )
 
-add_library(
-		VelocityMath INTERFACE
-		${HEADERS}
+add_library(VelocityMath INTERFACE)
+
+target_sources(
+		VelocityMath
+		INTERFACE
+		FILE_SET HEADERS
+		BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/src"
+		FILES ${HEADERS}
 )
 
 add_library(
@@ -85,6 +92,11 @@ if(MATH_BUILD_TESTS)
 	add_executable(
 			MathManualTests
 			tests/main/main.cpp
+	)
+
+	add_dependencies(
+			MathManualTests
+			VelocityMath_verify_interface_header_sets
 	)
 
 	target_link_libraries(
