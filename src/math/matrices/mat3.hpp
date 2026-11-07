@@ -35,7 +35,7 @@ struct Mat3 {
         const float c2r0, const float c2r1, const float c2r2
     ) : m({c0r0, c0r1, c0r2}, {c1r0, c1r1, c1r2}, {c2r0, c2r1, c2r2}) {}
 
-    // Static members
+    // Static constants
     static const Mat3 zero;
     static const Mat3 identity;
 
@@ -196,7 +196,20 @@ struct Mat3 {
         return result;
     }
 
-    // Miscellaneous
+    // Miscellaneous operators
+    friend Vector3 operator*(const Mat3& mat, const Vector3& vector) {
+        Vector3 result = Vector3::zero;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                result[row] += vector[col] * mat[col][row];
+            }
+        }
+
+        return result;
+    }
+    constexpr Mat3 operator-() const {
+        return *this * -1.0f;
+    }
     constexpr float* operator[](const size_t column) {
         return m[column];
     }
@@ -217,10 +230,6 @@ struct Mat3 {
     constexpr bool operator!=(const Mat3& other) const {
         return !(*this == other);
     }
-
-    constexpr Mat3 operator-() const {
-        return *this * -1.0f;
-    }
     friend std::ostream& operator<<(std::ostream& os, const Mat3& mat) {
         for (int row = 0; row < 3; row++) {
             os << '[';
@@ -236,16 +245,8 @@ struct Mat3 {
 
         return os;
     }
-    friend Vector3 operator*(const Mat3& mat, const Vector3& vector) {
-        Vector3 result = Vector3::zero;
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                result[row] += vector[col] * mat[col][row];
-            }
-        }
 
-        return result;
-    }
+    // Member methods
     [[nodiscard]] constexpr Vector3 column(const size_t index) const {
         return {
             m[index][0],
@@ -260,7 +261,6 @@ struct Mat3 {
             m[2][index]
         };
     }
-
     [[nodiscard]] constexpr float determinant() const {
         return m[0][0] * (m[1][1] * m[2][2] - m[2][1] * m[1][2]) -
                m[1][0] * (m[0][1] * m[2][2] - m[2][1] * m[0][2]) +
@@ -320,6 +320,7 @@ struct Mat3 {
         return result;
     }
 
+    // Static members
     static constexpr Mat3 abs(const Mat3& mat) {
         Mat3 result = zero;
         for (int col = 0; col < 3; col++) {

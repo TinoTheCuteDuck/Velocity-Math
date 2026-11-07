@@ -1,6 +1,7 @@
 #pragma once
 
 #include "math/defines.hpp"
+#include "math/quaternion.hpp"
 #include "math/vectors/vector3.hpp"
 #include "math/vectors/vector4.hpp"
 
@@ -38,7 +39,7 @@ struct Mat4 {
         const float c3r0, const float c3r1, const float c3r2, const float c3r3
     ) : m({ c0r0, c0r1, c0r2, c0r3 }, { c1r0, c1r1, c1r2, c1r3 }, { c2r0, c2r1, c2r2, c2r3 }, { c3r0, c3r1, c3r2, c3r3 }) {}
 
-    // Static members
+    // Static constants
     static const Mat4 zero;
     static const Mat4 identity;
 
@@ -199,7 +200,20 @@ struct Mat4 {
         return result;
     }
 
-    // Miscellaneous
+    // Miscellaneous operators
+    friend Vector4 operator*(const Mat4& mat, const Vector4& vector) {
+        Vector4 result = Vector4::zero;
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                result[row] += vector[col] * mat[col][row];
+            }
+        }
+
+        return result;
+    }
+    constexpr Mat4 operator-() const {
+        return *this * -1.0f;
+    }
     constexpr float* operator[](const size_t column) {
         return m[column];
     }
@@ -220,10 +234,6 @@ struct Mat4 {
     constexpr bool operator!=(const Mat4& other) const {
         return !(*this == other);
     }
-
-    constexpr Mat4 operator-() const {
-        return *this * -1.0f;
-    }
     friend std::ostream& operator<<(std::ostream& os, const Mat4& mat) {
         for (int row = 0; row < 4; row++) {
             os << '[';
@@ -239,16 +249,8 @@ struct Mat4 {
 
         return os;
     }
-    friend Vector4 operator*(const Mat4& mat, const Vector4& vector) {
-        Vector4 result = Vector4::zero;
-        for (int row = 0; row < 4; row++) {
-            for (int col = 0; col < 4; col++) {
-                result[row] += vector[col] * mat[col][row];
-            }
-        }
 
-        return result;
-    }
+    // Member methods
     [[nodiscard]] constexpr Vector4 column(const size_t index) const {
         return {
             m[index][0],
@@ -265,7 +267,6 @@ struct Mat4 {
             m[3][index]
         };
     }
-
     [[nodiscard]] constexpr float determinant() const {
         return m[0][0] * determinant3x3(m[1][1], m[1][2], m[1][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) -
                m[1][0] * determinant3x3(m[0][1], m[0][2], m[0][3], m[2][1], m[2][2], m[2][3], m[3][1], m[3][2], m[3][3]) +
@@ -348,6 +349,7 @@ struct Mat4 {
         return result;
     }
 
+    // Static methods
     static constexpr Mat4 abs(const Mat4& mat) {
         Mat4 result = zero;
         for (int col = 0; col < 4; col++) {
@@ -421,6 +423,18 @@ struct Mat4 {
 
         return m;
     }
+    static constexpr Mat4 rotate(const Quaternion& rotation) {
+        const Vector3 right = rotation * Vector3::right;
+        const Vector3 up = rotation * Vector3::up;
+        const Vector3 forward = rotation * Vector3::forward;
+
+        return {
+            Vector4(right, 0.0f),
+            Vector4(up, 0.0f),
+            Vector4(forward, 0.0f),
+            Vector4(0.0f, 0.0f, 0.0f, 1.0f)
+        };
+    }
 
     // Right-handed -z forward perspective
     static constexpr Mat4 perspective(const float FOV, const float aspectRatio, const float zNear, const float zFar) {
@@ -479,6 +493,7 @@ struct Mat4 {
     }
 
   private:
+    // Private utility methods
     static constexpr float determinant3x3(const float c0r0, const float c0r1, const float c0r2, const float c1r0, const float c1r1, const float c1r2, const float c2r0, const float c2r1, const float c2r2) {
         return c0r0 * (c1r1 * c2r2 - c2r1 * c1r2) -
                c1r0 * (c0r1 * c2r2 - c2r1 * c0r2) +

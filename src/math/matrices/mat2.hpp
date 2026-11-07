@@ -27,7 +27,7 @@ struct Mat2 {
     constexpr Mat2(const Vector2& column0, const Vector2& column1) : m({column0.x, column0.y}, {column1.x, column1.y}) {}
     constexpr Mat2(const float c0r0, const float c0r1, const float c1r0, const float c1r1) : m({c0r0, c0r1}, {c1r0, c1r1}) {}
 
-    // Static members
+    // Static constants
     static const Mat2 zero;
     static const Mat2 identity;
 
@@ -188,7 +188,20 @@ struct Mat2 {
         return result;
     }
 
-    // Miscellaneous
+    // Miscellaneous operators
+    friend Vector2 operator*(const Mat2& mat, const Vector2& vector) {
+        Vector2 result = Vector2::zero;
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 2; col++) {
+                result[row] += vector[col] * mat[col][row];
+            }
+        }
+
+        return result;
+    }
+    constexpr Mat2 operator-() const {
+        return *this * -1.0f;
+    }
     constexpr float* operator[](const size_t column) {
         return m[column];
     }
@@ -209,10 +222,6 @@ struct Mat2 {
     constexpr bool operator!=(const Mat2& other) const {
         return !(*this == other);
     }
-
-    constexpr Mat2 operator-() const {
-        return *this * -1.0f;
-    }
     friend std::ostream& operator<<(std::ostream& os, const Mat2& mat) {
         for (int row = 0; row < 2; row++) {
             os << '[';
@@ -228,16 +237,8 @@ struct Mat2 {
 
         return os;
     }
-    friend Vector2 operator*(const Mat2& mat, const Vector2& vector) {
-        Vector2 result = Vector2::zero;
-        for (int row = 0; row < 2; row++) {
-            for (int col = 0; col < 2; col++) {
-                result[row] += vector[col] * mat[col][row];
-            }
-        }
 
-        return result;
-    }
+    // Member methods
     [[nodiscard]] constexpr Vector2 column(const size_t index) const {
         return {
             m[index][0],
@@ -250,7 +251,6 @@ struct Mat2 {
             m[1][index]
         };
     }
-
     [[nodiscard]] constexpr float determinant() const {
         return m[0][0] * m[1][1] - m[1][0] * m[0][1];
     }
@@ -287,6 +287,7 @@ struct Mat2 {
         };
     }
 
+    // Static methods
     static constexpr Mat2 abs(const Mat2& mat) {
         Mat2 result = zero;
         for (int col = 0; col < 2; col++) {

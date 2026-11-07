@@ -24,7 +24,7 @@ struct Vector3 {
     constexpr Vector3(const float x, const Vector2& other) : x(x), y(other.x), z(other.y) {}
     constexpr Vector3(const float values[3]) : x(values[0]), y(values[1]), z(values[2]) {}
 
-    // Static members
+    // Static constants
     static const Vector3 zero;
     static const Vector3 one;
     static const Vector3 up;
@@ -187,9 +187,16 @@ struct Vector3 {
         return old;
     }
 
-    // Miscellaneous
+    // Miscellaneous operators
     friend constexpr Vector3 operator*(const float scalar, const Vector3& vector) {
         return vector * scalar;
+    }
+    constexpr Vector3 operator-() const {
+        return {
+            -x,
+            -y,
+            -z
+        };
     }
     constexpr float& operator[](const size_t index) {
         if (index >= 3) {
@@ -229,20 +236,6 @@ struct Vector3 {
     constexpr bool operator!=(const Vector3& other) const {
         return !(*this == other);
     }
-    constexpr Vector3 operator-() const {
-        return {
-            -x,
-            -y,
-            -z
-        };
-    }
-    [[nodiscard]] constexpr Vector3 reciprocal() const {
-        return {
-            1.0f / x,
-            1.0f / y,
-            1.0f / z
-        };
-    }
     friend std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
         os << "("
            << (std::abs(vector.x) > VELOCITY_MATH_EPSILON ? vector.x : 0.0f) << ", "
@@ -252,22 +245,7 @@ struct Vector3 {
         return os;
     }
 
-    [[nodiscard]] constexpr float length() const {
-        return std::sqrt(x * x + y * y + z * z);
-    }
-    [[nodiscard]] constexpr float lengthSquared() const {
-        return x * x + y * y + z * z;
-    }
-    static constexpr float distance(const Vector3& a, const Vector3& b) {
-        return (a - b).length();
-    }
-    static constexpr float distanceSquared(const Vector3& a, const Vector3& b) {
-        return (a - b).lengthSquared();
-    }
-    static constexpr float angle(const Vector3& a, const Vector3& b) {
-        return std::acos(std::clamp(dot(a.normalized(), b.normalized()), -1.0f, 1.0f));
-    }
-
+    // Member methods
     constexpr Vector3& normalize() {
         const float len = length();
         if (std::abs(len) < VELOCITY_MATH_EPSILON) {
@@ -292,6 +270,30 @@ struct Vector3 {
             y / len,
             z / len
         };
+    }
+    [[nodiscard]] constexpr Vector3 reciprocal() const {
+        return {
+            1.0f / x,
+            1.0f / y,
+            1.0f / z
+        };
+    }
+    [[nodiscard]] constexpr float length() const {
+        return std::sqrt(x * x + y * y + z * z);
+    }
+    [[nodiscard]] constexpr float lengthSquared() const {
+        return x * x + y * y + z * z;
+    }
+
+    // Static methods
+    static constexpr float distance(const Vector3& a, const Vector3& b) {
+        return (a - b).length();
+    }
+    static constexpr float distanceSquared(const Vector3& a, const Vector3& b) {
+        return (a - b).lengthSquared();
+    }
+    static constexpr float angle(const Vector3& a, const Vector3& b) {
+        return std::acos(std::clamp(dot(a.normalized(), b.normalized()), -1.0f, 1.0f));
     }
 
     static constexpr float dot(const Vector3& a, const Vector3& b) {
@@ -358,6 +360,6 @@ struct Vector3 {
 
 constexpr Vector3 Vector3::zero = Vector3(0.0f);
 constexpr Vector3 Vector3::one = Vector3(1.0f);
-constexpr Vector3 Vector3::up = Vector3(0.0f, 1.0f, 0.0f);
 constexpr Vector3 Vector3::right = Vector3(1.0f, 0.0f, 0.0f);
+constexpr Vector3 Vector3::up = Vector3(0.0f, 1.0f, 0.0f);
 constexpr Vector3 Vector3::forward = Vector3(0.0f, 0.0f, -1.0f);
